@@ -1,3 +1,2 @@
-# Index
+# Jamstackハンズオン
 
-![logo](/images/logo.png)

@@ -1,5 +1,5 @@
 module.exports = {
-  title: 'HelloWorld',
+  title: 'Jamstack Handson',
   themeConfig: {
     sidebar: ['/', '/page1', '/page2', '/page3'],
   },
