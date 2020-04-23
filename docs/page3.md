@@ -55,4 +55,113 @@
 ![手順16](/images/3-16.png)
 ![手順17](/images/3-17.png)
 
+## microCMSからデータを取得する
+
+- 前章のNext.jsで作成したアプリを改修していきます
+- 通信先を変更するため`api/qiitaApi.js`を修正します
+    - アクセス先がQiitaじゃなくなるためファイル名が不適切ですが気にせず進めます
+
+```js
+import fetch from 'node-fetch';
+
+// microCMSで作成した自身のAPIのURLに変更
+const baseUrl = 'https://xxxxxxxxxxx.microcms.io/api/v1';
+
+const headers = {
+  // APIキーを設定
+  'X-API-KEY': 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
+};
+
+export async function getItems() {
+  const res = await fetch(`${baseUrl}/items`, { headers });
+  return res.json();
+}
+
+export async function getItem({ id }) {
+  const res = await fetch(`${baseUrl}/items/${id}`, { headers });
+  return res.json();
+}
+```
+
+- QiitaのAPIとmicroCMSのAPIではレスポンスのデータ構造が異なるのでmicroCMS仕様に修正します
+- `pages/items/index.js`の`getStaticProps`内を修正
+
+```jsx
+import Link from 'next/link';
+import { Container, ListGroup } from 'react-bootstrap';
+import { getItems } from '../../api/qiitaApi';
+
+function Items({ items }) {
+  return (
+    <Container>
+      <h1>Hello</h1>
+      <ListGroup>
+        {items.map(item => (
+          <Link key={item.id} href="/items/[id]" as={`/items/${item.id}`}>
+            <ListGroup.Item action>{item.title}</ListGroup.Item>
+          </Link>
+        ))}
+      </ListGroup>
+    </Container>
+  );
+}
+
+
+export async function getStaticProps() {
+  const data = await getItems();
+  // data.map を data.contents.map に修正
+  const items = data.contents.map(item => ({ id: item.id, title: item.title }));
+  return { props: { items } };
+}
+
+export default Items;
+```
+
+- `pages/items/[id].js`の`getStaticProps`と`getStaticPaths`を修正
+
+```jsx
+import { Container } from 'react-bootstrap';
+import { getItem, getItems } from '../../api/qiitaApi';
+
+function Item({ item }) {
+  return (
+    <Container>
+      <h1>{item.title}</h1>
+      <hr />
+      <div dangerouslySetInnerHTML={{ __html: item.body }}></div>
+    </Container>
+  );
+}
+
+export async function getStaticProps({ params }) {
+  const data = await getItem({ id: params.id });
+  // rendered_body を body に修正
+  const item = { id: data.id, title: data.title, body: data.body };
+  return { props: { item } };
+}
+
+export async function getStaticPaths() {
+  const data = await getItems();
+  // data.map を data.contents.map に修正
+  const paths = data.contents.map(item => `/items/${item.id}`);
+  return { paths, fallback: false };
+}
+
+export default Item;
+```
+
+- アプリにアクセスして確認してみましょう
+    - アプリを停止してしまった人は`yarn dev`で起動しましょう
+- うまくいっていればmicroCMSに登録した記事が表示されているはずです
+
+![一覧](/images/3-18.png)
+![詳細](/images/3-19.png)
+
+- 最新版をnowにデプロイしましょう
+
+```sh
+now --prod
+```
+
+- これでローカルで表示していたページを公開することができました
 
