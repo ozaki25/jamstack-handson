@@ -387,3 +387,9 @@ export default Item;
 - 見た目の雰囲気が変わりました
 
 ![item bootstrap](/images/2-13.png)
+
+- 修正版をデプロイします
+
+```sh
+now --prod
+```
