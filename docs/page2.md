@@ -1,4 +1,4 @@
-# Page2
+# Next.jsを使ってJamstackなアプリを作ってみる
 
 ## Topic1
 
