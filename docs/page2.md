@@ -136,8 +136,9 @@ import fetch from 'node-fetch';
 function Item({ item }) {
   return (
     <div>
-      <h2>{item.title}</h2>
-      <pre dangerouslySetInnerHTML={{ __html: item.body }}></pre>
+      <h1>{item.title}</h1>
+      <hr />
+      <div dangerouslySetInnerHTML={{ __html: item.body }}></div>
     </div>
   );
 }
@@ -149,7 +150,7 @@ export async function getStaticProps({ params }) {
   return { props: { item } };
 }
 
-export async function getStaticPaths() {
+export async function getStaticPaths() {f
   const res = await fetch('https://qiita.com/api/v2/items');
   const data = await res.json();
   const paths = data.map(item => `/items/${item.id}`);
@@ -236,8 +237,9 @@ import { getItem, getItems } from '../../api/qiitaApi';
 function Item({ item }) {
   return (
     <div>
-      <h2>{item.title}</h2>
-      <pre dangerouslySetInnerHTML={{ __html: item.body }}></pre>
+      <h1>{item.title}</h1>
+      <hr />
+      <div dangerouslySetInnerHTML={{ __html: item.body }}></div>
     </div>
   );
 }
@@ -297,3 +299,91 @@ now
 ![now](/images/2-11.png)
 
 
+### レイアウト
+
+- https://react-bootstrap.github.io/
+
+```sh
+yarn add react-bootstrap bootstrap
+```
+
+```jsx
+// pages/_app.js
+
+import 'bootstrap/dist/css/bootstrap.css'
+import App from 'next/app'
+
+export default App
+```
+
+```jsx
+// pages/items/index.js
+
+import Link from 'next/link';
+import { Container, ListGroup } from 'react-bootstrap';
+import { getItems } from '../../api/qiitaApi';
+
+function Items({ items }) {
+  return (
+    <Container>
+      <h1>Hello</h1>
+      <ListGroup>
+        {items.map(item => (
+          <Link key={item.id} href="/items/[id]" as={`/items/${item.id}`}>
+            <ListGroup.Item actiona>{item.title}</ListGroup.Item>
+          </Link>
+        ))}
+      </ListGroup>
+    </Container>
+  );
+}
+
+export async function getStaticProps() {
+  const data = await getItems();
+  const items = data.map(item => ({ id: item.id, title: item.title }));
+  return { props: { items } };
+}
+
+export default Items;
+```
+
+- 見た目の雰囲気が変わりました
+
+![items bootstrap](/images/2-12.png)
+
+- 記事詳細画面も修正します
+
+```jsx
+// pages/items/[id].js
+
+import { Container } from 'react-bootstrap';
+import { getItem, getItems } from '../../api/qiitaApi';
+
+function Item({ item }) {
+  return (
+    <Container>
+      <h1>{item.title}</h1>
+      <hr />
+      <div dangerouslySetInnerHTML={{ __html: item.body }}></div>
+    </Container>
+  );
+}
+
+export async function getStaticProps({ params }) {
+  const data = await getItem({ id: params.id });
+  const item = { id: data.id, title: data.title, body: data.rendered_body };
+  return { props: { item } };
+}
+
+export async function getStaticPaths() {
+  const data = await getItems();
+  const paths = data.map(item => `/items/${item.id}`);
+  return { paths, fallback: false };
+}
+
+export default Item;
+```
+
+- 見た目の雰囲気が変わりました
+
+![item bootstrap](/images/2-13.png)
