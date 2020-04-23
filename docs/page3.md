@@ -165,3 +165,97 @@ now --prod
 
 - これでローカルで表示していたページを公開することができました
 
+## microCMSのデータ追加をトリガーに再デプロイする
+
+- 前節でmicroCMS化対応は完了しました
+- ですが、コンテンツのデータはビルド時に取得するためmicroCMS上でブログ記事を追加したら再ビルド/デプロイを実行する必要があります
+- 毎回手動で叩くのは面倒なので自動化してしまいましょう
+
+### GitHubにソースをアップロード
+
+- ビルド/デプロイを自動化するためにはソースコードをネット上にあげておく必要があります
+- GitHubにリポジトリを作成しアップロードしましょう
+- 以下のURLから作成します
+    - [https://github.com/new](https://github.com/new)
+
+![リポジトリ作成](/images/3-20.png)
+![コピーURL](/images/3-21.png)
+
+- gitコマンドを使ってアップロードします
+
+::: tip
+gitコマンドが入っていない人は[公式サイト](https://git-scm.com/)からダウンロードしてください
+:::
+
+```sh
+# URL部分はコピーしたものを貼り付け
+git remote add origin https://github.com/xxxx/jamstack-sample.git
+git add .
+git commit -m "Jamstackハンズオン"
+git push origin master
+```
+
+- 最後のコマンドでGitHub上にアップロードされます
+    - ID/パスワードを求められたら適宜入力してください
+- GitHubのページに戻りリロードするとアップロードできていることを確認できます
+
+![リポジトリ](/images/3-22.png)
+
+### nowとGitHubを連携する
+
+- デプロイ先のnowと先程作成したGitHubのリポジトリを連動させます
+- nowのダッシュボードにアクセスしてください
+    - [https://vercel.com/dashboard](https://vercel.com/dashboard)
+- これまでnowコマンドでデプロイしていたアプリが表示されています
+
+![nowダッシュボード](/images/3-23.png)
+![Settings](/images/3-24.png)
+![リポジトリを保存](/images/3-25.png)
+
+- 次の手順はこの画面からスタートするので閉じずにそのまま残しておいてください
+
+### microCMSの更新をnowのトリガーに設定する
+
+- 最後にmicroCMSのコンテンツが更新された時に自動でnowに再ビルド/デプロイされるようにします
+- nowでビルド/デプロイを実行させるURLを発行します
+    - [https://vercel.com/ozaki25/jamstack-sample/settings/git-integration?provider=github](https://vercel.com/ozaki25/jamstack-sample/settings/git-integration?provider=github)
+
+![create hook](/images/3-26.png)
+![copy url](/images/3-27.png)
+
+- コピーしたURLをmicroCMSに登録します
+    - [https://app.microcms.io/](https://app.microcms.io/)
+
+![microcms](/images/3-28.png)
+![microcms](/images/3-29.png)
+![microcms](/images/3-30.png)
+
+- これで設定が完了しました
+
+## 動作確認
+
+- microCMSで記事を追加してみましょう
+
+![create item](/images/3-31.png)
+
+- nowのダッシュボードに戻ってしばらくすると黄色いビルド中のステータスに変更されるはずです
+
+![now](/images/3-32.png)
+
+- ビルド/デプロイが完了すると緑のステータスに戻ります
+- 完了したらWebページに再度アクセスしてみましょう
+
+![now](/images/3-33.png)
+![now](/images/3-34.png)
+
+- コンテンツが最新化されていることを確認できました！
+
+![app](/images/3-35.png)
+![app](/images/3-36.png)
+
+
+## まとめ
+
+- microCMSを使ってコンテンツの管理しAPIとして公開する方法を学びました
+- GitHub、now、microCMSを連動させてコンテンツを更新すると自動でビルドデプロイされる仕組みを構築しました
+- 本番システムとしての使用例も多くある構成なのでJamstackなアプリを作りたくなったらこの構成を試してみてください
