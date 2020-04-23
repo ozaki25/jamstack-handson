@@ -182,17 +182,19 @@ yarn build
 
 import fetch from 'node-fetch';
 
+const baseUrl = 'https://qiita.com/api/v2';
+
 const headers = {
   Authorization: 'Bearer 6e7aeb00e0f5cf1cd964c25b703b2c4b85d06fd6',
 };
 
 export async function getItems() {
-  const res = await fetch('https://qiita.com/api/v2/items', { headers });
+  const res = await fetch(`${baseUrl}/items`, { headers });
   return res.json();
 }
 
 export async function getItem({ id }) {
-  const res = await fetch(`https://qiita.com/api/v2/items/${id}`, { headers });
+  const res = await fetch(`${baseUrl}/items/${id}`, { headers });
   return res.json();
 }
 ```
