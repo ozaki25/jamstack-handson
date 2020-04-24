@@ -14,20 +14,17 @@
 
 ![完成形](/images/2-0.png)
 
-## Next.jsでWebアプリを作成する
+## Next.jsの雛形を作成
 
 - Next.jsを使ってアプリを作成していきます
-
-### 雛形の生成
-
-- Next.jsの雛形を生成ライブラリである`create-next-app`とコマンドラインツールである`yarn`をインストールします
+- Next.jsの雛形を生成ライブラリである`create-next-app`と、コマンドラインツールである`yarn`をインストールします
 
 ```sh
 npm i -g create-next-app yarn
 ```
 
 - `create-next-app`を使ってアプリを作成します
-    - 途中選択肢が出たら`Default starter app`を選択します
+    - 途中で選択肢が出たら`Default starter app`を選択します
 
 ```sh
 create-next-app jamstack-sample
@@ -40,9 +37,13 @@ cd jamstack-sample
 yarn dev
 ```
 
-- [http://localhost:3000](http://localhost:3000)にアクセスすると以下の画面がでるはずです
+- [http://localhost:3000](http://localhost:3000)にアクセスすると以下の画面が表示されるはずです
 
 ![create-next-app](/images/2-1.png)
+
+::: tip
+今後出てくるコマンドの実行は特別な案内がない限り`jamstack-sample`ディレクトリ内(=`yarn dev`を実行した場所)で実行してください
+:::
 
 ## 記事一覧ページの作成
 
@@ -54,7 +55,7 @@ yarn dev
 - `pages/items/index.js`というファイルを作成して以下の内容を記述してください
 
 ::: tip
-`/pages`フォルダ配下のディレクトリ構成がそのままURL構造に適用されます。`/pages/items/index.js`は`/items/index`にマッピングされます。一般的に`/index`は省略するので`/items`にマッピングされることになります。
+`/pages`配下のディレクトリ構成がそのままURL構造に適用されます。`/pages/items/index.js`は`/items/index`にマッピングされます。一般的に`/index`は省略するので`/items`にマッピングされることになります。
 :::
 
 ```jsx
@@ -75,7 +76,7 @@ export default Items;
 
 - 表示が確認できたらダミーの記事一覧を表示するように修正してみます
 
-```jsx
+```jsx{1-6,12-16}
 // ダミーの記事一覧を格納した配列を定義
 const items = [
   { id: 1, title: '記事のタイトル1' },
@@ -107,7 +108,7 @@ export default Items;
 
 ### QiitaのAPIから取得したデータを表示する
 
-- QiitaのAPIをたたくために通信処理を実行するためのライブラリをインストールします
+- QiitaのAPIをたたくので、通信処理を実行するためのライブラリをインストールします
 
 ```sh
 yarn add node-fetch
@@ -115,7 +116,7 @@ yarn add node-fetch
 
 - `pages/items/index.js`を修正してQiitaのAPIからデータを取得するよにします
 
-```jsx
+```jsx{1-2,4-5,18-27}
 // 通信ライブラリであるnode-fetchをimport
 import fetch from 'node-fetch';
 
@@ -157,10 +158,19 @@ Next.jsの機能として[getStaticProps](https://nextjs.org/docs/basic-features
 ![qiita items](/images/2-4.png)
 
 
+## 記事詳細ページの作成
 
-```jsx
-// pages/items/index.js
+- 一覧画面で記事を選択すると詳細ページが表示されるようにしてみましょう
+- 詳細ページのURLは`/items/記事のID`となるようにします
+    - ex. `http://localhost:3000/items/4075d03278d1fb51cc37`
 
+### 記事一覧に記事詳細へのリンクを追加する
+
+- 記事詳細ページはこの後作りますが、先に一覧から詳細へ遷移できるように修正しておきます
+- `pages/items/index.js`に[Link](https://nextjs.org/docs/api-reference/next/link)を追加します
+
+```jsx{1-2,12-15}
+// ページ遷移をするためのLinkコンポーネントをimport
 import Link from 'next/link';
 import fetch from 'node-fetch';
 
@@ -170,7 +180,12 @@ function Items({ items }) {
       <h1>Hello</h1>
       <ul>
         {items.map(item => (
-          <li key={item.id}>{item.title}</li>
+          <li key={item.id}>
+            {/* Linkを追加 */}
+            <Link href="/items/[id]" as={`/items/${item.id}`}>
+              <a>{item.title}</a>
+            </Link>
+          </li>
         ))}
       </ul>
     </div>
@@ -187,11 +202,20 @@ export async function getStaticProps() {
 export default Items;
 ```
 
-```js
-// pages/items/[id].js
+- 遷移先はエラーになりますが一覧がリンク化されました
 
+![qiita items](/images/2-5.png)
+
+### 詳細ページを作成する
+
+- 一覧画面は`/items`にマッピングさせたいので`/pages/items/index.js`というファイルを作りましたが、今回作りたいページは`/items/記事のID`なのでURLが動的に変動します
+- そういう場合は`[id].js`といったファイル名で作成することで対応できます
+- `/pages/items/[id].js`を作成した以下の内容を記述してください
+
+```js
 import fetch from 'node-fetch';
 
+// getStaticPropsからitemを受け取る
 function Item({ item }) {
   return (
     <div>
@@ -202,16 +226,23 @@ function Item({ item }) {
   );
 }
 
+// ビルド時に実行される関数で、returnした値をコンポーネントに渡すことができる
 export async function getStaticProps({ params }) {
+  // QiitaのAPIから記事の詳細情報を取得
   const res = await fetch(`https://qiita.com/api/v2/items/${params.id}`);
   const data = await res.json();
+  // レスポンスから必要な項目だけを抽出
   const item = { id: data.id, title: data.title, body: data.rendered_body };
+  // 抽出した値をreturn(コンポーネントに引数として渡される)
   return { props: { item } };
 }
 
-export async function getStaticPaths() {f
+// ビルド時に実行される関数で、[id].jsのidに具体的にどんな値が入るのかをリストでreturnする
+export async function getStaticPaths() {
+  // QiitaのAPIから記事一覧の情報を取得
   const res = await fetch('https://qiita.com/api/v2/items');
   const data = await res.json();
+  // レスポンスを元に詳細ページのURLのリストを作成
   const paths = data.map(item => `/items/${item.id}`);
   return { paths, fallback: false };
 }
@@ -219,7 +250,13 @@ export async function getStaticPaths() {f
 export default Item;
 ```
 
-![qiita items](/images/2-5.png)
+::: tip
+Jamstackはビルド時に各ページのHTMLを生成するため、今回の記事詳細ページのような場合でも全てのページのHTMLを作成しておく必要があります。どのようなURLのページがあるかはAPIを叩いてみないとわからないので動的に指定する必要がありますが、[getStaticPaths](https://nextjs.org/docs/basic-features/data-fetching#getstaticpaths-static-generation)を使うとそれを実現することができます。
+:::
+
+- ここまでできたら一覧画面から詳細画面へ遷移してみましょう
+- 以下のように記事の本文が表示されているはずです
+
 ![qiita item](/images/2-6.png)
 
 ```sh
