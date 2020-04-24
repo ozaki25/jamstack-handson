@@ -1,4 +1,4 @@
-# Next.jsを使ってJamstackなアプリを作る
+# 2.Next.jsを使ってJamstackなアプリを作る
 
 ## 概要
 

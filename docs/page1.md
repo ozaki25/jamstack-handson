@@ -1,4 +1,4 @@
-# Jamstackとは
+# 1.Jamstackとは
 
 ## Jamstackとは
 
