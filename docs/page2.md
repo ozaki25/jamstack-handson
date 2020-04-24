@@ -2,15 +2,16 @@
 
 ## 概要
 
-- [Next.js](https://nextjs.org/)というWebページを作成するためのフレームワークを使います
-- この章ではAPIは自前で作成せずに[QiitaのAPI](https://qiita.com/api/v2/docs)を使ってデータを取得し、Qiitaの最新記事一覧を表示するWebアプリを作成します
-- Next.jsを使うとビルド時にAPIからデータを取得してHTMLを生成することができるため、Jamstackの構成を実現することができます
+- この章ではビルド時にAPIからデータを取得してページを生成する、というJamstackの特徴を持ったアプリを作成していきます
+    - [Next.js](https://nextjs.org/)というWebページを作成するためのフレームワークを使います
+    - この章ではAPIは自前で作成せずに[QiitaのAPI](https://qiita.com/api/v2/docs)を使ってデータを取得し、Qiitaの最新記事一覧を表示してみます
+    - Next.jsを使うとビルド時にAPIからデータを取得してHTMLを生成することができるため、Jamstackの構成を実現することができます
 
 ## ゴール
 
-- Next.jsを使ってWebアプリを作成する
-- Next.jsの機能を使ってビルド時にAPIからデータを取得する
-- 作成したWebアプリをnowにデプロイし公開する
+- Next.jsを使ってWebアプリを作成できていること
+- Next.jsの機能を使ってビルド時にAPIからデータを取得できていること
+- 作成したWebアプリをnowにデプロイし公開できていること
 
 ![完成形](/images/2-0.png)
 
@@ -259,23 +260,41 @@ Jamstackはビルド時に各ページのHTMLを生成するため、今回の�
 
 ![qiita item](/images/2-6.png)
 
+
+### ビルドしてみる
+
+- これまでは`yarn dev`コマンドで開発モードで起動していました
+- 本番用にビルドして成果物を確認してみます
+
 ```sh
 yarn build
 ```
 
+- このようなログがでます
+
 ![build](/images/2-7.png)
+
+- build後の成果物は`.next`ディレクトリに作成されます
+- `.next`の内部はいろいろなファイルがあって複雑ですが、一覧画面と各詳細画面のhtmlファイルが生成されていることを確認できます
+
 ![tree](/images/2-8.png)
 
-- build後の成果物は`.next`フォルダに作成される
-- 各ページのhtmlファイル(idの値.html)が生成されていることを確認できる
+- 以下のコマンドでビルドしたアプリを起動することができます
 
-### リファクタ
+```sh
+yarn start
+```
 
-- 通信処理が何度も出てくるので専用のファイルに切り出す
+- `yarn dev`のときは都度ビルドが走るため最新記事が都度反映されていました
+- `yarn start`の場合はビルド済みのアプリを起動するだけなので、再ビルドするまで記事一覧の内容は更新されません
+    - APIをたたくのがビルド時のみで、実行時はAPIをたたかないのがJamstackの特徴でしたね
+
+### リファクタリング
+
+- 通信処理が何度も出てくるので専用のファイルに切り出しておきましょう
+- `api/qiitaApi.js`を作成して以下の内容を記述してください
 
 ```js
-// api/qiitaApi.json
-
 import fetch from 'node-fetch';
 
 const baseUrl = 'https://qiita.com/api/v2';
@@ -284,21 +303,25 @@ const headers = {
   Authorization: 'Bearer 6e7aeb00e0f5cf1cd964c25b703b2c4b85d06fd6',
 };
 
+// 記事一覧を取得する関数
 export async function getItems() {
   const res = await fetch(`${baseUrl}/items`, { headers });
   return res.json();
 }
 
+// 記事詳細を取得する関数
 export async function getItem({ id }) {
   const res = await fetch(`${baseUrl}/items/${id}`, { headers });
   return res.json();
 }
 ```
 
-```jsx
-// pages/items/index.js
+- 作成したqiitaApiの内容を適用していきます
+- `pages/items/index.js`を修正します
 
+```jsx{2-3,23}
 import Link from 'next/link';
+// qiitaApiから一覧を取得するgetItemsをimport
 import { getItems } from '../../api/qiitaApi';
 
 function Items({ items }) {
@@ -327,10 +350,11 @@ export async function getStaticProps() {
 export default Items;
 ```
 
-```jsx
-// pages/items/[id].js
+- `pages/items/[id].js`を修正します
 
-import { getItem, getItems } from '../../api/qiitaApi';
+```jsx{1-2,15,21}
+// qiitaApiから一覧を取得するgetItemsと詳細を取得するgetItemをimport
+import { getItems, getItem } from '../../api/qiitaApi';
 
 function Item({ item }) {
   return (
@@ -357,67 +381,94 @@ export async function getStaticPaths() {
 export default Item;
 ```
 
-### デプロイ
+- `yarn dev`で起動して変わらずに動くことを確認しておいてください
 
-- GitHubのアカウントを作成する
-    - https://github.com/
-- nowのアカウントを作成する
-    - GitHubアカウントを使ってnowのアカウントを作成できます
-    - https://vercel.com/
-- nowのコマンドラインツールをインストール
+## アプリをnowにデプロイする
+
+- これまでは端末のローカル環境で起動していたのでその端末からしかアクセスできませんでした
+- ホスティングサービスにアプリをアップロードしてどこからでもアクセスできるように公開してみましょう
+- 今回は[now](https://vercel.com/home)というホスティングサービスを使います
+
+### アカウントの作成
+
+- まずはGitHubのアカウントを作成します
+- 以下のページからアカウントを作成してください
+    - [https://github.com/](https://github.com/)
+- 次にnowのアカウントを作成します
+- GitHubアカウントを使ってnowのアカウントを作成できます
+    - [https://vercel.com/signup](https://vercel.com/signup)
+
+### コマンドラインツールのセットアップ
+
+- nowのコマンドラインツールをインストールします
 
 ```sh
 npm i -g now@latest
 ```
 
-- コマンドラインでnowにログイン
-    - メールアドレスの入力を求められるのでGitHub登録時のメールアドレスを入力
-    - メールが飛ぶのでVerifyを押すとログインできる
+- インストールできたらコマンドラインでnowにログインします
+    - メールアドレスの入力を求められるのでGitHub登録時のメールアドレスを入力してください
+    - メールが飛ぶのでVerifyを押すとログインできます
 
 ```sh
 now login
 ```
 
+- 以下のようなメールが届くのでVerifyを押します
+
 ![verify](/images/2-9.png)
 
-- デプロイする
+### デプロイする
+
+- 以下のコマンドでデプロイします
     - いろいろ聞かれるので全てデフォルトのままエンターでOK
-    - デプロイが実行されるので少し時間がかかる
+    - デプロイが実行されるので少し時間がかかります
 
 ```sh
 now
 ```
 
-- デプロイが完了するとURLが表示される
+- デプロイが完了するとURLが表示されます
 
 ![now deploy](/images/2-10.png)
 
-- アクセスするとローカルで動かしていたのと同じアプリが表示されることを確認できる
+- アクセスするとローカルで動かしていたのと同じアプリが表示されます！
 
 ![now](/images/2-11.png)
 
 
-### レイアウト
+## レイアウトを整える
 
-- https://react-bootstrap.github.io/
+- Jamstackとは直接関係ありませんがせっかくなのでレイアウトを整えておきます
+- 今回は[ReactBootstrap](https://react-bootstrap.github.io/)というライブラリを使います
+
+### ReactBootstrapのセットアップ
+
+- 必要なライブラリをインストールします
 
 ```sh
 yarn add react-bootstrap bootstrap
 ```
 
-```jsx
-// pages/_app.js
+- 設定ファイルを作成します
+- `pages/_app.js`を作成して以下の内容を記述してください
 
+```jsx
 import 'bootstrap/dist/css/bootstrap.css'
 import App from 'next/app'
 
 export default App
 ```
 
-```jsx
-// pages/items/index.js
+### ReactBootstrapのコンポーネントを適用する
 
+- まずいは一覧画面から適用していきます
+- `pages/items/index.js`を修正してください
+    - ここでは[Container](https://react-bootstrap.netlify.app/layout/grid/#container)と[ListGroup](https://react-bootstrap.netlify.app/components/list-group/)を使います
+
+```jsx{2-3,8,10,12-14,16-17}
 import Link from 'next/link';
+// react-bootstrapからコンポーネントをimport
 import { Container, ListGroup } from 'react-bootstrap';
 import { getItems } from '../../api/qiitaApi';
 
@@ -428,7 +479,7 @@ function Items({ items }) {
       <ListGroup>
         {items.map(item => (
           <Link key={item.id} href="/items/[id]" as={`/items/${item.id}`}>
-            <ListGroup.Item actiona>{item.title}</ListGroup.Item>
+            <ListGroup.Item action>{item.title}</ListGroup.Item>
           </Link>
         ))}
       </ListGroup>
@@ -450,10 +501,11 @@ export default Items;
 ![items bootstrap](/images/2-12.png)
 
 - 記事詳細画面も修正します
+- `pages/items/[id].js`を修正してください
+    - ここでは[Container](https://react-bootstrap.netlify.app/layout/grid/#container)を使います
 
-```jsx
-// pages/items/[id].js
-
+```jsx{1-2,7,11}
+// react-bootstrapからコンポーネントをimport
 import { Container } from 'react-bootstrap';
 import { getItem, getItems } from '../../api/qiitaApi';
 
@@ -482,12 +534,21 @@ export async function getStaticPaths() {
 export default Item;
 ```
 
-- 見た目の雰囲気が変わりました
+- 詳細画面も見た目の雰囲気が変わりました
 
 ![item bootstrap](/images/2-13.png)
 
 - 修正版をデプロイします
+    - 二度目以降のデプロイはデフォルトだとdev環境へのデプロイになるので`--prod`をつける
 
 ```sh
 now --prod
 ```
+
+- デプロイが完了すると修正版が公開されているはずです
+
+## まとめ
+
+- `create-next-app`によるNext.jsを使ったアプリの作成のしかたを学びました
+- `getStaticProps`などNext.jsの機能を使うことでビルド時にAPIからデータを取得しJamstackなアプリにすることができました
+- nowにデプロイすることで作成したアプリを世の中に公開することができました

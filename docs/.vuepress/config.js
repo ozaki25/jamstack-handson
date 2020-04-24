@@ -3,4 +3,7 @@ module.exports = {
   themeConfig: {
     sidebar: ['/', '/page1', '/page2', '/page3'],
   },
+  markdown: {
+    lineNumbers: true,
+  },
 };
