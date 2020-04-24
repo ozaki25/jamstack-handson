@@ -119,9 +119,9 @@ export default Items;
 yarn add node-fetch
 ```
 
-- `pages/items/index.js`を修正してQiitaのAPIからデータを取得するよにします
+- `pages/items/index.js`を修正してQiitaのAPIからデータを取得するようにします
 
-```jsx{1-2,4-5,18-27}
+```jsx{1-2,4-5,18-32}
 // 通信ライブラリであるnode-fetchをimport
 import fetch from 'node-fetch';
 
@@ -143,6 +143,7 @@ function Items({ items }) {
 export async function getStaticProps() {
   // QiitaのAPIをコール
   const res = await fetch('https://qiita.com/api/v2/items', {
+    // アクセストークンをセット
     headers: {
       'Authorization: Bearer a8f7b4026700cd36eb8e3a75525d767d0115aabe',
     },
@@ -156,6 +157,10 @@ export async function getStaticProps() {
 
 export default Items;
 ```
+
+::: tip
+QiitaのAPIは[アクセス回数に制限がある](https://qiita.com/api/v2/docs#%E5%88%A9%E7%94%A8%E5%88%B6%E9%99%90)ためトークンを発行してセットしておいてください。Qiitaのアカウントがなかったりトークンの発行手順がわからない場合は上記サンプルに埋め込まれているトークンを使ってください。[マイページの「アプリケーション」](https://qiita.com/settings/applications)からトークンを発行できます。
+:::
 
 ::: tip
 Next.jsの機能として[getStaticProps](https://nextjs.org/docs/basic-features/data-fetching#getstaticprops-static-generation)という名前で関数を定義するとビルド時に処理が実行され結果をコンポーネントに渡すことができます。ここでAPIをたたく処理を行うことでビルド時にデータを取得しコンポーネントに渡しています。(コンポーネントとはHTMLをreturnしているfunctionのこと)
@@ -202,7 +207,12 @@ function Items({ items }) {
 }
 
 export async function getStaticProps() {
-  const res = await fetch('https://qiita.com/api/v2/items');
+  const res = await fetch('https://qiita.com/api/v2/items', {
+    // アクセストークンをセット
+    headers: {
+      'Authorization: Bearer a8f7b4026700cd36eb8e3a75525d767d0115aabe',
+    },
+  });
   const data = await res.json();
   const items = data.map(item => ({ id: item.id, title: item.title }));
   return { props: { items } };
@@ -238,7 +248,12 @@ function Item({ item }) {
 // ビルド時に実行される関数で、returnした値をコンポーネントに渡すことができる
 export async function getStaticProps({ params }) {
   // QiitaのAPIから記事の詳細情報を取得
-  const res = await fetch(`https://qiita.com/api/v2/items/${params.id}`);
+  const res = await fetch(`https://qiita.com/api/v2/items/${params.id}`, {
+    // アクセストークンをセット
+    headers: {
+      'Authorization: Bearer a8f7b4026700cd36eb8e3a75525d767d0115aabe',
+    },
+  });
   const data = await res.json();
   // レスポンスから必要な項目だけを抽出
   const item = { id: data.id, title: data.title, body: data.rendered_body };
@@ -249,7 +264,12 @@ export async function getStaticProps({ params }) {
 // ビルド時に実行される関数で、[id].jsのidに具体的にどんな値が入るのかをリストでreturnする
 export async function getStaticPaths() {
   // QiitaのAPIから記事一覧の情報を取得
-  const res = await fetch('https://qiita.com/api/v2/items');
+  const res = await fetch('https://qiita.com/api/v2/items', {
+    // アクセストークンをセット
+    headers: {
+      'Authorization: Bearer a8f7b4026700cd36eb8e3a75525d767d0115aabe',
+    },
+  });
   const data = await res.json();
   // レスポンスを元に詳細ページのURLのリストを作成
   const paths = data.map(item => `/items/${item.id}`);
@@ -308,7 +328,7 @@ import fetch from 'node-fetch';
 const baseUrl = 'https://qiita.com/api/v2';
 
 const headers = {
-  Authorization: 'Bearer 6e7aeb00e0f5cf1cd964c25b703b2c4b85d06fd6',
+  Authorization: 'Bearer a8f7b4026700cd36eb8e3a75525d767d0115aabe',
 };
 
 // 記事一覧を取得する関数
