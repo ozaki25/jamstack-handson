@@ -18,7 +18,7 @@
 ## Next.jsの雛形を作成
 
 - Next.jsを使ってアプリを作成していきます
-- Next.jsの雛形を生成ライブラリである`create-next-app`と、コマンドラインツールである`yarn`をインストールします
+- Next.jsの雛形生成ライブラリである`create-next-app`と、コマンドラインツールである`yarn`をインストールします
 
 ```sh
 npm i -g create-next-app yarn
@@ -37,6 +37,10 @@ create-next-app jamstack-sample
 cd jamstack-sample
 yarn dev
 ```
+
+::: tip
+止めたいときは `Ctl + c` で停止できます
+:::
 
 - [http://localhost:3000](http://localhost:3000)にアクセスすると以下の画面が表示されるはずです
 
@@ -138,7 +142,11 @@ function Items({ items }) {
 // getStaticPropsという名前の関数はビルド時にフレームワークが実行してくれる
 export async function getStaticProps() {
   // QiitaのAPIをコール
-  const res = await fetch('https://qiita.com/api/v2/items');
+  const res = await fetch('https://qiita.com/api/v2/items', {
+    headers: {
+      'Authorization: Bearer a8f7b4026700cd36eb8e3a75525d767d0115aabe',
+    },
+  });
   const data = await res.json();
   // APIから取得したデータを必要な項目(idとtitle)だけに絞り込む
   const items = data.map(item => ({ id: item.id, title: item.title }));
