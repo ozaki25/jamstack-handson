@@ -1,28 +1,60 @@
 # Next.jsを使ってJamstackなアプリを作ってみる
 
-## Topic1
+## 概要
 
-## Topic2
+- [Next.js](https://nextjs.org/)というWebページを作成するためのフレームワークを使います
+- この章ではAPIは自前で作成せずに[QiitaのAPI](https://qiita.com/api/v2/docs)を使ってデータを取得し、Qiitaの最新記事一覧を表示するWebアプリを作成します
+- Next.jsを使うとビルド時にAPIからデータを取得してHTMLを生成することができるため、Jamstackの構成を実現することができます
 
-## Topic3
+## ゴール
 
-## コマンドメモ
+- Next.jsを使ってWebアプリを作成する
+- Next.jsの機能を使ってビルド時にAPIからデータを取得する
+- 作成したWebアプリをnowにデプロイし公開する
 
-### アプリ作成
+## Next.jsでWebアプリを作成する
+
+- Next.jsを使ってアプリを作成していきます
+
+### 雛形の生成
+
+- Next.jsの雛形を生成ライブラリである`create-next-app`をインストールします
 
 ```sh
 npm i -g yarn create-next-app
+```
+
+- `create-next-app`を使ってアプリを作成します
+    - 途中選択肢が出たら`Default starter app`を選択します
+
+```sh
 create-next-app jamstack-sample
-# Default starter appを選択
+```
+
+- 作成できたら起動できることを確認しましょう
+
+```sh
 cd jamstack-sample
 yarn dev
 ```
 
+- [http://localhost:3000](http://localhost:3000)にアクセスすると以下の画面がでるはずです
+
 ![create-next-app](/images/2-1.png)
 
-```jsx
-// pages/items/index.js
+## 記事一覧ページの作成
 
+- Qiitaの新着記事一覧を表示するページを作成していきます
+
+### 埋め込みデータで記事一覧ページの作成
+
+- `pages/items/index.js`というファイルを作成して以下の内容を記述してください
+
+::: tip
+`/pages`フォルダ配下のディレクトリ構成がそのままURL構造に適用されます。`/pages/items/index.js`は`/items/index`にマッピングされますが、一般的に`/index`は省略するので`/items`にアクセスしてみましょう
+:::
+
+```jsx
 function Items() {
   return (
     <div>
@@ -34,11 +66,14 @@ function Items() {
 export default Items;
 ```
 
+- [http://localhost:3000/items](http://localhost:3000/items)にアクセスしてHelloが表示されることを確認しましょう
+
 ![hello](/images/2-2.png)
 
-```jsx
-// pages/items/index.js
+- 表示が確認できたらダミーの記事一覧を表示するように修正してみます
 
+```jsx
+// ダミーの記事一覧を格納した配列を定義
 const items = [
   { id: 1, title: '記事のタイトル1' },
   { id: 2, title: '記事のタイトル2' },
@@ -61,17 +96,27 @@ function Items() {
 export default Items;
 ```
 
+::: tip
+`.map`を使うと配列に対してループ処理を実行できます。上のコードでは記事の数だけliタグを生成しています
+:::
+
 ![list](/images/2-3.png)
+
+### QiitaのAPIから取得したデータを表示する
+
+- QiitaのAPIをたたくために通信処理を実行するためのライブラリをインストールします
 
 ```sh
 yarn add node-fetch
 ```
 
-```jsx
-// pages/items/index.js
+- `pages/items/index.js`を修正してQiitaのAPIからデータを取得するよにします
 
+```jsx
+// 通信ライブラリであるnode-fetchをimport
 import fetch from 'node-fetch';
 
+// itemsという引数で記事一覧を受け取る
 function Items({ items }) {
   return (
     <div>
@@ -85,19 +130,30 @@ function Items({ items }) {
   );
 }
 
+// getStaticPropsという名前の関数はビルド時に実行される
 export async function getStaticProps() {
+  // QiitaのAPIをコール
   const res = await fetch('https://qiita.com/api/v2/items');
   const data = await res.json();
+  // APIから取得したデータを必要な項目だけに絞り込む
   const items = data.map(item => ({ id: item.id, title: item.title }));
+  // 取得したデータをpropsとしてreturnするとItems関数の引数に渡すことができる
   return { props: { items } };
 }
 
 export default Items;
 ```
 
-- https://qiita.com/items
+::: tip
+Next.jsの機能として[getStaticProps](https://nextjs.org/docs/basic-features/data-fetching#getstaticprops-static-generation)という名前で関数を定義するとビルド時に処理が実行され結果をコンポーネントに渡すことができます。ここでAPIをたたく処理を行うことでビルド時にデータを取得しコンポーネントに渡しています。
+:::
+
+- 修正語[http://localhost:3000/items](http://localhost:3000/items)にアクセスするとQiitaの最新記事が表示されているはずです
+    - Qiitaの最新記事一覧は[こちらのページ](https://qiita.com/items)で確認できます
 
 ![qiita items](/images/2-4.png)
+
+
 
 ```jsx
 // pages/items/index.js
