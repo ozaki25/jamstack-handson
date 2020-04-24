@@ -1,4 +1,4 @@
-# Next.jsを使ってJamstackなアプリを作ってみる
+# Next.jsを使ってJamstackなアプリを作る
 
 ## 概要
 
@@ -11,6 +11,8 @@
 - Next.jsを使ってWebアプリを作成する
 - Next.jsの機能を使ってビルド時にAPIからデータを取得する
 - 作成したWebアプリをnowにデプロイし公開する
+
+![完成形](/images/2-0.png)
 
 ## Next.jsでWebアプリを作成する
 
