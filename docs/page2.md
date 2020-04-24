@@ -20,10 +20,10 @@
 
 ### 雛形の生成
 
-- Next.jsの雛形を生成ライブラリである`create-next-app`をインストールします
+- Next.jsの雛形を生成ライブラリである`create-next-app`とコマンドラインツールである`yarn`をインストールします
 
 ```sh
-npm i -g yarn create-next-app
+npm i -g create-next-app yarn
 ```
 
 - `create-next-app`を使ってアプリを作成します
@@ -33,7 +33,7 @@ npm i -g yarn create-next-app
 create-next-app jamstack-sample
 ```
 
-- 作成できたら起動できることを確認しましょう
+- 作成できたらログに表示される案内に従って起動できることを確認しましょう
 
 ```sh
 cd jamstack-sample
@@ -50,10 +50,11 @@ yarn dev
 
 ### 埋め込みデータで記事一覧ページの作成
 
+- まずは新しいページを作成してHelloだけ表示させてみましょう
 - `pages/items/index.js`というファイルを作成して以下の内容を記述してください
 
 ::: tip
-`/pages`フォルダ配下のディレクトリ構成がそのままURL構造に適用されます。`/pages/items/index.js`は`/items/index`にマッピングされますが、一般的に`/index`は省略するので`/items`にアクセスしてみましょう
+`/pages`フォルダ配下のディレクトリ構成がそのままURL構造に適用されます。`/pages/items/index.js`は`/items/index`にマッピングされます。一般的に`/index`は省略するので`/items`にマッピングされることになります。
 :::
 
 ```jsx
@@ -99,7 +100,7 @@ export default Items;
 ```
 
 ::: tip
-`.map`を使うと配列に対してループ処理を実行できます。上のコードでは記事の数だけliタグを生成しています
+`.map`を使うと配列の要素を順番にループ処理できます。上のコードでは記事の数だけliタグを生成しています
 :::
 
 ![list](/images/2-3.png)
@@ -118,7 +119,7 @@ yarn add node-fetch
 // 通信ライブラリであるnode-fetchをimport
 import fetch from 'node-fetch';
 
-// itemsという引数で記事一覧を受け取る
+// getStaticPropsから渡されるitemsという変数を受け取る
 function Items({ items }) {
   return (
     <div>
@@ -132,12 +133,12 @@ function Items({ items }) {
   );
 }
 
-// getStaticPropsという名前の関数はビルド時に実行される
+// getStaticPropsという名前の関数はビルド時にフレームワークが実行してくれる
 export async function getStaticProps() {
   // QiitaのAPIをコール
   const res = await fetch('https://qiita.com/api/v2/items');
   const data = await res.json();
-  // APIから取得したデータを必要な項目だけに絞り込む
+  // APIから取得したデータを必要な項目(idとtitle)だけに絞り込む
   const items = data.map(item => ({ id: item.id, title: item.title }));
   // 取得したデータをpropsとしてreturnするとItems関数の引数に渡すことができる
   return { props: { items } };
@@ -147,10 +148,10 @@ export default Items;
 ```
 
 ::: tip
-Next.jsの機能として[getStaticProps](https://nextjs.org/docs/basic-features/data-fetching#getstaticprops-static-generation)という名前で関数を定義するとビルド時に処理が実行され結果をコンポーネントに渡すことができます。ここでAPIをたたく処理を行うことでビルド時にデータを取得しコンポーネントに渡しています。
+Next.jsの機能として[getStaticProps](https://nextjs.org/docs/basic-features/data-fetching#getstaticprops-static-generation)という名前で関数を定義するとビルド時に処理が実行され結果をコンポーネントに渡すことができます。ここでAPIをたたく処理を行うことでビルド時にデータを取得しコンポーネントに渡しています。(コンポーネントとはHTMLをreturnしているfunctionのこと)
 :::
 
-- 修正語[http://localhost:3000/items](http://localhost:3000/items)にアクセスするとQiitaの最新記事が表示されているはずです
+- 修正後[http://localhost:3000/items](http://localhost:3000/items)にアクセスするとQiitaの最新記事が表示されているはずです
     - Qiitaの最新記事一覧は[こちらのページ](https://qiita.com/items)で確認できます
 
 ![qiita items](/images/2-4.png)
