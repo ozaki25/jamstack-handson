@@ -31,7 +31,9 @@ npm i -g create-next-app yarn
 create-next-app jamstack-sample
 ```
 
-- 作成できたらログに表示される案内に従って起動できることを確認しましょう
+- 作成できたらVSCodeでjamstack-sampleプロジェクトを開きましょう
+    - [参考リンク](/page0.html#vscodeが入っていること)
+- ログに表示される案内に従って起動できることを確認しましょう
 
 ```sh
 cd jamstack-sample
