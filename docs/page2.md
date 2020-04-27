@@ -145,7 +145,7 @@ export async function getStaticProps() {
   const res = await fetch('https://qiita.com/api/v2/items', {
     // アクセストークンをセット
     headers: {
-      'Authorization: Bearer a8f7b4026700cd36eb8e3a75525d767d0115aabe',
+      Authorization: 'Bearer a8f7b4026700cd36eb8e3a75525d767d0115aabe',
     },
   });
   const data = await res.json();
@@ -210,7 +210,7 @@ export async function getStaticProps() {
   const res = await fetch('https://qiita.com/api/v2/items', {
     // アクセストークンをセット
     headers: {
-      'Authorization: Bearer a8f7b4026700cd36eb8e3a75525d767d0115aabe',
+      Authorization: 'Bearer a8f7b4026700cd36eb8e3a75525d767d0115aabe',
     },
   });
   const data = await res.json();
@@ -251,7 +251,7 @@ export async function getStaticProps({ params }) {
   const res = await fetch(`https://qiita.com/api/v2/items/${params.id}`, {
     // アクセストークンをセット
     headers: {
-      'Authorization: Bearer a8f7b4026700cd36eb8e3a75525d767d0115aabe',
+      Authorization: 'Bearer a8f7b4026700cd36eb8e3a75525d767d0115aabe',
     },
   });
   const data = await res.json();
@@ -267,7 +267,7 @@ export async function getStaticPaths() {
   const res = await fetch('https://qiita.com/api/v2/items', {
     // アクセストークンをセット
     headers: {
-      'Authorization: Bearer a8f7b4026700cd36eb8e3a75525d767d0115aabe',
+      Authorization: 'Bearer a8f7b4026700cd36eb8e3a75525d767d0115aabe',
     },
   });
   const data = await res.json();
