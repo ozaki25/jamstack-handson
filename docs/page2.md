@@ -231,7 +231,7 @@ export default Items;
 
 - 一覧画面は`/items`にマッピングさせたいので`/pages/items/index.js`というファイルを作りましたが、今回作りたいページは`/items/記事のID`なのでURLが動的に変動します
 - そういう場合は`[id].js`といったファイル名で作成することで対応できます
-- `/pages/items/[id].js`を作成した以下の内容を記述してください
+- `/pages/items/[id].js`を作成し以下の内容を記述してください
 
 ```js
 import fetch from 'node-fetch';
@@ -496,7 +496,7 @@ export default App
 
 ### ReactBootstrapのコンポーネントを適用する
 
-- まずいは一覧画面から適用していきます
+- まずは一覧画面から適用していきます
 - `pages/items/index.js`を修正してください
     - ここでは[Container](https://react-bootstrap.netlify.app/layout/grid/#container)と[ListGroup](https://react-bootstrap.netlify.app/components/list-group/)を使います
 
