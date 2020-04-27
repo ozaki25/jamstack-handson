@@ -1,5 +1,8 @@
 # 1.Jamstackとは
 
+- 元記事
+    - [Jamstackって何なの？何がいいの？](https://qiita.com/ozaki25/items/4075d03278d1fb51cc37)
+
 ## Jamstackとは
 
 ![jamstack.png](/images/1-1.png)
