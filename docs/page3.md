@@ -88,7 +88,7 @@ export async function getItem({ id }) {
 - QiitaのAPIとmicroCMSのAPIではレスポンスのデータ構造が異なるのでmicroCMS仕様に修正します
 - `pages/items/index.js`の`getStaticProps`内を修正
 
-```jsx
+```jsx{23-24}
 import Link from 'next/link';
 import { Container, ListGroup } from 'react-bootstrap';
 import { getItems } from '../../api/qiitaApi';
@@ -121,7 +121,7 @@ export default Items;
 
 - `pages/items/[id].js`の`getStaticProps`と`getStaticPaths`を修正
 
-```jsx
+```jsx{16-17,23-24}
 import { Container } from 'react-bootstrap';
 import { getItem, getItems } from '../../api/qiitaApi';
 
