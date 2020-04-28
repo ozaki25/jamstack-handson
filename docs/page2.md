@@ -327,6 +327,9 @@ yarn start -p 3001
 
 - 通信処理が何度も出てくるので専用のファイルに切り出しておきましょう
 - `api/qiitaApi.js`を作成して以下の内容を記述してください
+    - pagesディレクトリと横並びになる位置にapiディレクトリを作成してください
+
+![apiフォルダ](/images/2-14.png)
 
 ```js
 import fetch from 'node-fetch';
