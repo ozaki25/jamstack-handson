@@ -31,7 +31,13 @@ npm i -g create-next-app yarn
 create-next-app jamstack-sample
 ```
 
+- jamstack-sampleというフォルダが作成されてその中にアプリの雛形が生成されました
+
+![スターター](/images/2-15.png)
+
 - ログに表示される案内に従って起動できることを確認しましょう
+
+![create-next-app log](/images/2-16.png)
 
 ```sh
 cd jamstack-sample
