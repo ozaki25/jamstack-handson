@@ -31,8 +31,6 @@ npm i -g create-next-app yarn
 create-next-app jamstack-sample
 ```
 
-- 作成できたらVSCodeでjamstack-sampleプロジェクトを開きましょう
-    - [参考リンク](/page0.html#vscodeが入っていること)
 - ログに表示される案内に従って起動できることを確認しましょう
 
 ```sh
@@ -52,6 +50,9 @@ yarn dev
 今後出てくるコマンドの実行は特別な案内がない限り`jamstack-sample`ディレクトリ内(=`yarn dev`を実行した場所)で実行してください
 :::
 
+- 動きが確認できたらVSCodeでjamstack-sampleプロジェクトを開いておきましょう
+    - [参考リンク](/page0.html#vscodeが入っていること)
+
 ## 2-2.記事一覧ページの作成
 
 - Qiitaの新着記事一覧を表示するページを作成していきます
@@ -62,7 +63,7 @@ yarn dev
 - `pages/items/index.js`というファイルを作成して以下の内容を記述してください
 
 ::: tip
-`/pages`配下のディレクトリ構成がそのままURL構造に適用されます。`/pages/items/index.js`は`/items/index`にマッピングされます。一般的に`/index`は省略するので`/items`にマッピングされることになります。
+`pages`配下のディレクトリ構成がそのままURL構造に適用されます。`pages/items/index.js`は`http://localhost:3000/items/index`にマッピングされます。一般的に`/index`は省略するので`http://localhost:3000/items`にマッピングされることになります。
 :::
 
 ```jsx
@@ -229,9 +230,9 @@ export default Items;
 
 ### 詳細ページを作成する
 
-- 一覧画面は`/items`にマッピングさせたいので`/pages/items/index.js`というファイルを作りましたが、今回作りたいページは`/items/記事のID`なのでURLが動的に変動します
+- 一覧画面は`/items`にマッピングさせたいので`pages/items/index.js`というファイルを作りましたが、今回作りたいページは`/items/記事のID`なのでURLが動的に変動します
 - そういう場合は`[id].js`といったファイル名で作成することで対応できます
-- `/pages/items/[id].js`を作成し以下の内容を記述してください
+- `pages/items/[id].js`を作成し以下の内容を記述してください
 
 ```js
 import fetch from 'node-fetch';
@@ -316,7 +317,7 @@ yarn start -p 3001
 ```
 
 ::: tip
-デフォルトではyarn devと同じ3000番ポートで起動するのでオプションをつけて3001で起動しています。http://localhost:3001/itemsにアクセスしてみてください。
+デフォルトでは`yarn dev`と同じ3000番ポートで起動するのでオプションをつけて3001番で起動しています。[http://localhost:3001/items](http://localhost:3001/items)にアクセスしてみてください。
 :::
 
 - `yarn dev`のときは都度ビルドが走るため最新記事が都度反映されていました
@@ -576,7 +577,7 @@ export default Item;
 ![item bootstrap](/images/2-13.png)
 
 - 修正版をデプロイします
-    - 二度目以降のデプロイはデフォルトだとdev環境へのデプロイになるので`--prod`をつける
+    - 二度目以降のデプロイはデフォルトだとdev環境へのデプロイになるので`--prod`をつけます
 
 ```sh
 now --prod
