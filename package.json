@@ -8,5 +8,9 @@
   },
   "dependencies": {
     "vuepress": "^1.4.0"
+  },
+  "devDependencies": {
+    "@vuepress/plugin-back-to-top": "^1.5.0",
+    "vuepress-plugin-seo": "^0.1.3"
   }
 }
