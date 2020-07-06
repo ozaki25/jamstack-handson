@@ -4,6 +4,8 @@ module.exports = {
   title: 'Jamstack Handson',
   themeConfig: {
     domain: 'https://jamstack-handson.ozaki25.now.sh',
+    repo: 'ozaki25/jamstack-handson',
+    repoLabel: 'GitHub',
     sidebar: ['/page0', '/page1', '/page2', '/page3'],
   },
   markdown: {
